@@ -4,7 +4,7 @@ import getOrCreateDB from "./models/server/seedDB";
 import getOrCreateStorage from "./models/server/storage.collection";
 
 // Initialize Database and Storage Bucket
-export async function middleware(req : NextRequest){
+export async function proxy(req : NextRequest){
   await getOrCreateDB();
   await getOrCreateStorage();
   return NextResponse.next();

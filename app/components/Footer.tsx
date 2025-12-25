@@ -1,6 +1,6 @@
 import React from "react";
-import AnimatedGridPattern from "@/components/magicui/animated-grid-pattern";
-import { cn } from "@/utils/cn";
+import {AnimatedGridPattern} from "@/components/ui/animated-grid-pattern";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 const Footer = () => {
@@ -36,7 +36,7 @@ const Footer = () => {
                         </li>
                     ))}
                 </ul>
-                <div className="mt-4 text-center">&copy; {new Date().getFullYear()} Riverpod</div>
+                <div className="mt-4 text-center">&copy; {new Date().getFullYear()} DevXchange</div>
             </div>
             <AnimatedGridPattern
                 numSquares={30}

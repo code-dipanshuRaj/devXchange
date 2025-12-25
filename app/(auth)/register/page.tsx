@@ -26,7 +26,7 @@ const LabelInputContainer = ({
     return <div className={cn("flex w-full flex-col space-y-2", className)}>{children}</div>;
 };
 
-export function Register(){
+export default function Register(){
   
   const [isLoading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);

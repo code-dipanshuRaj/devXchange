@@ -11,12 +11,16 @@ import { UserPrefs } from "@/store/auth";
 
 type QuestionWithFields = Models.Row & {
     title: string;
-    content?: string;
+    content: string;
     tags: string[];
     attachmentId?: string;
-    author: Models.User<UserPrefs>;
-    totalVotes?: number;
-    totalAnswers?: number;
+    author: {
+        $id: string;
+        name: string;
+        reputation: number;
+    };
+    totalVotes: number;
+    totalAnswers: number;
 };
 
 const QuestionCard = ({ ques }: { ques: QuestionWithFields }) => {
@@ -71,7 +75,7 @@ const QuestionCard = ({ ques }: { ques: QuestionWithFields }) => {
                         >
                             {ques.author.name}
                         </Link>
-                        <strong>&quot;{ques.author.prefs.reputation}&quot;</strong>
+                        <strong>&quot;{ques.author.reputation}&quot;</strong>
                     </div>
                     <span>asked {convertDateToRelativeTime(new Date(ques.$createdAt))}</span>
                 </div>

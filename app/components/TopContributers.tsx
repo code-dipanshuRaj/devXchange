@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
 
-import { AnimatedList } from "@/components/magicui/animated-list";
+import { AnimatedList } from "@/components/ui/animated-list";
 import { users } from "@/models/server/config";
 import { Models, Query } from "node-appwrite";
-import { UserPrefs } from "@/store/Auth";
+import { UserPrefs } from "@/store/auth";
 import convertDateToRelativeTime from "@/utils/relativeTime";
 import { avatars } from "@/models/client/config";
 
@@ -23,7 +23,7 @@ const Notification = ({ user }: { user: Models.User<UserPrefs> }) => {
             <div className="flex flex-row items-center gap-3">
                 <picture>
                     <img
-                        src={avatars.getInitials(user.name, 40, 40).href}
+                        src={avatars.getInitials({name : user.name,width : 40, height : 40})}
                         alt={user.name}
                         className="rounded-2xl"
                     />
@@ -48,7 +48,7 @@ const Notification = ({ user }: { user: Models.User<UserPrefs> }) => {
 };
 
 export default async function TopContributers() {
-    const topUsers = await users.list<UserPrefs>([Query.limit(10)]);
+    const topUsers = await users.list<UserPrefs>({queries : [Query.limit(10)]});
 
     return (
         <div className="bg-background relative flex max-h-[400px] min-h-[400px] w-full max-w-[32rem] flex-col overflow-hidden rounded-lg bg-white/10 p-6 shadow-lg">

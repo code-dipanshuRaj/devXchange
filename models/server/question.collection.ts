@@ -52,7 +52,7 @@ export default async function createQuestionsCollection() {
       tableId: questionsCollection,
       key: 'attachmentId',
       size: 1000,
-      required: false
+      required: true
     })
   ]);
   console.log(`Created ${questionsCollection} collection with columns.`);

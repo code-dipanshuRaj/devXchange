@@ -1,22 +1,24 @@
-import { answersCollection, db } from "../name";
+import { db } from "../name";
+import createDBIfNotExists from "./createDB";
 import createQuestionsCollection from "./question.collection";
 import createAnswersCollection from "./answer.collection";
 import createCommentsCollection from "./comment.collection";
+import createVotesCollection from "./vote.collection";
 
 import { tableDB } from "./config";
-import { table } from "console";
-import { ClientPageRoot } from "next/dist/client/components/client-page";
 
 export default async function getOrCreateDB(){
     try {
-        await tableDB.get({databaseId : db})
-        console.log("Database connection established successfully")
+        const res = await tableDB.get({databaseId : db})
+        console.log("Database connection established successfully ",res)
     } catch (error) {
       try {
+        await createDBIfNotExists(),
         await Promise.all([
           createAnswersCollection(),
           createQuestionsCollection(),
           createCommentsCollection(),
+          createVotesCollection()  
         ])
         console.log("Database connected and all collections created")
       } catch (error) {

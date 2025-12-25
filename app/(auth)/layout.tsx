@@ -2,7 +2,6 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
-import { BackgroundBeams } from "@/components/ui/background-beams"
 import { WavyBackground } from "@/components/ui/wavy-background";
 
 export default function Layout({children} : {children : React.ReactNode}) {
@@ -16,9 +15,10 @@ export default function Layout({children} : {children : React.ReactNode}) {
   if(session) return null;
   
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center py-12">
-      <WavyBackground />
+    <>
+      <WavyBackground className="relative flex min-h-screen flex-col items-center justify-center py-12">
       <div className="relative">{children}</div>
-    </div>
+      </WavyBackground>
+    </>
   )
 }

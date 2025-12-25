@@ -1,5 +1,5 @@
 import env from '@/env';
-import {Client, Account, Storage, Avatars, TablesDB} from 'node-appwrite';
+import {Client, Account, Storage, Avatars, TablesDB, Users} from 'node-appwrite';
 
 const client = new Client()
     .setEndpoint(env.appwrite.endpoint)
@@ -11,5 +11,6 @@ const account = new Account(client);
 const storage = new Storage(client);
 const avatars = new Avatars(client);
 const tableDB = new TablesDB(client);
+const users = new Users(client)
 
-export {client, account, storage, avatars, tableDB};
+export {client, account, storage, avatars, tableDB, users};
