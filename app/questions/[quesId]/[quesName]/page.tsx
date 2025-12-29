@@ -56,27 +56,28 @@ type AnswersWithExtraData = AnswerAttributes & {
 }
 
 const Page = async ({ params }: { params: { quesId: string; quesName: string } }) => {
+    const {quesId, quesName} = await params;
     const [question, answers, upvotes, downvotes, comments] = await Promise.all([
-        tableDB.getRow({databaseId : db, tableId: questionsCollection, rowId: params.quesId}),
+        tableDB.getRow({databaseId : db, tableId: questionsCollection, rowId: quesId}),
         tableDB.listRows<AnswerAttributes>({databaseId : db, tableId: answersCollection, queries: [
             Query.orderDesc("$createdAt"),
-            Query.equal("questionId", params.quesId),
+            Query.equal("questionId", quesId),
         ]}),
         tableDB.listRows({databaseId : db, tableId: votesCollection, queries: [
-            Query.equal("typeId", params.quesId),
+            Query.equal("typeId", quesId),
             Query.equal("type", "question"),
             Query.equal("voteStatus", "upvoted"),
             Query.limit(1), // for optimization
         ]}),
         tableDB.listRows({databaseId : db, tableId: votesCollection, queries: [
-            Query.equal("typeId", params.quesId),
+            Query.equal("typeId", quesId),
             Query.equal("type", "question"),
             Query.equal("voteStatus", "downvoted"),
             Query.limit(1), // for optimization
         ]}),
         tableDB.listRows<CommentAttributes>({databaseId : db, tableId: commentsCollection, queries: [
             Query.equal("type", "question"),
-            Query.equal("typeId", params.quesId),
+            Query.equal("typeId", quesId),
             Query.orderDesc("$createdAt"),
         ]}),
     ]);

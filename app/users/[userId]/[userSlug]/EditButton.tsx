@@ -9,10 +9,7 @@ const EditButton = () => {
     const { userId, userSlug } = useParams();
     const { user, hydrated } = useAuthStore();
 
-    // Don't render until store is hydrated
-    if (!hydrated) return null;
-    
-    if (user?.$id !== userId) return null;
+    if (!hydrated || !user || user.$id !== userId) return null;
 
     return (
         <Link

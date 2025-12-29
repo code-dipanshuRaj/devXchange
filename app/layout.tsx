@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 import { cn } from "@/lib/utils";
 import Header from "./components/Header";
-import SessionProvider from "@/components/SessionProvider";
+import AuthProvider from "@/components/AuthProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -20,10 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={cn(inter.className, "dark:bg-black dark:text-white")}>
-        <SessionProvider>
+        <AuthProvider>
           <Header />
           {children}
-        </SessionProvider>
+        </AuthProvider>
       </body>
     </html>
   );

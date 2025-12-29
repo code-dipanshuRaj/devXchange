@@ -73,7 +73,7 @@ const QuestionForm = ({ question } : { question?: QuestionWithFields }) => {
             tags: new Set((question?.tags || []) as string[]),
             attachment: null,
         });
-    }, [hydrated, question, user?.$id]);
+    }, [question, user?.$id, hydrated]);
 
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState("");
@@ -175,7 +175,6 @@ const QuestionForm = ({ question } : { question?: QuestionWithFields }) => {
     const submit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Check if user is authenticated
         if (!hydrated || !user) {
             router.push("/login");
             return;

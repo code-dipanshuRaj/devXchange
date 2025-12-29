@@ -44,25 +44,10 @@ export default function Register(){
 
     setLoading(true);
     setError(null);
-    const {signIn, logIn} = getAuthStore();
+    const {signIn} = getAuthStore();
     const {success, error} = await signIn(email, password, name);
-    
-    if(!success) {
-      setError(error?.message || "Something went wrong");
-      setLoading(false);
-      return;
-    }
-    
-    // After successful signup, automatically log in
-    const loginResponse = await logIn(email, password);
     setLoading(false);
-    
-    if (loginResponse.success) {
-      // Redirect on success
-      window.location.href = "/";
-    } else {
-      setError(loginResponse.error?.message || "Account created but login failed. Please try logging in.");
-    }
+    if(!success) setError(error?.message || "Something went wrong");
   }  
       return (
         <div className="mx-auto w-full max-w-md rounded-none border border-solid border-white/30 bg-white p-4 shadow-input dark:bg-black md:rounded-2xl md:p-8">

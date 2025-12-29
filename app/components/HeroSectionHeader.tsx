@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import {IconCloud} from "@/components/ui/icon-cloud";
 import {Particles} from "@/components/ui/particles";
 import {ShimmerButton} from "@/components/ui/shimmer-button";
@@ -43,8 +44,14 @@ const images = slugs.map(
   )
 
 const HeroSectionHeader = () => {
-    const { session, user, hydrated } = useAuthStore();
-    const isAuthenticated = hydrated && (session || user);
+    const { session, hydrated } = useAuthStore();
+    const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+
+    React.useEffect(() => {
+        if (hydrated) {
+            setIsAuthenticated(!!session);
+        }
+    }, [session, hydrated]);
 
     return (
         <div className="container mx-auto px-4">

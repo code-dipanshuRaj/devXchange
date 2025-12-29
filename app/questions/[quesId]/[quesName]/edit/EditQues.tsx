@@ -9,26 +9,18 @@ import React from "react";
 
 // type need to be fixed
 const EditQues = ({ question }: { question: any }) => {
-    const { user, hydrated, verifySession } = useAuthStore();
+    const { user, hydrated } = useAuthStore();
     const router = useRouter();
 
     React.useEffect(() => {
         if (!hydrated) return;
+        
+        if (!user || question.authorId !== user.$id) {
+            router.push(`/questions/${question.$id}/${slugify(question.title)}`);
+        }
+    }, [hydrated, user, question, router]);
 
-        const checkAuth = async () => {
-            // Verify session is still valid
-            const isValid = await verifySession();
-            
-            if (!isValid || !user || question.authorId !== user.$id) {
-                router.push(`/questions/${question.$id}/${slugify(question.title)}`);
-            }
-        };
-
-        checkAuth();
-    }, [hydrated, user, question, verifySession, router]);
-
-    // Don't render until hydrated and verified
-    if (!hydrated || !user || user.$id !== question.authorId) {
+    if (!hydrated) {
         return (
             <div className="flex min-h-screen items-center justify-center">
                 <div className="text-center">
@@ -38,6 +30,8 @@ const EditQues = ({ question }: { question: any }) => {
             </div>
         );
     }
+
+    if (!user || user.$id !== question.authorId) return null;
 
     return (
         <div className="block pb-20 pt-32">
