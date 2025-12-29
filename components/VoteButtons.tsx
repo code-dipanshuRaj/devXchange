@@ -29,27 +29,31 @@ const VoteButtons = ({
     const router = useRouter();
 
     React.useEffect(() => {
+        // Only fetch if store is hydrated and user exists
+        if (!hydrated) return;
+        
         (async () => {
-            // Wait for hydration before checking user
-            if (!hydrated) return;
-            
             if (user) {
-                const response = await tableDB.listRows({databaseId : db, tableId : votesCollection, queries : [
-                    Query.equal("type", type),
-                    Query.equal("typeId", id),
-                    Query.equal("votedById", user.$id),
-                ]});
-                setVotedDocument(response.rows[0] || null);    
+                try {
+                    const response = await tableDB.listRows({databaseId : db, tableId : votesCollection, queries : [
+                        Query.equal("type", type),
+                        Query.equal("typeId", id),
+                        Query.equal("votedById", user.$id),
+                    ]});
+                    setVotedDocument(response.rows[0] || null);
+                } catch (error) {
+                    console.error("Failed to fetch vote document:", error);
+                    setVotedDocument(null);
+                }
             } else {
-                // No user, set to null (not undefined) to indicate checked
+                // No user, set to null (not undefined) to indicate we've checked
                 setVotedDocument(null);
             }
         })();
-    }, [user, id, type, hydrated]);
+    }, [hydrated, user, id, type]);
 
     const toggleUpvote = async () => {
-        if (!hydrated) return;
-        if (!user) {
+        if (!hydrated || !user) {
             router.push("/login");
             return;
         }
@@ -79,8 +83,7 @@ const VoteButtons = ({
     };
 
     const toggleDownvote = async () => {
-        if (!hydrated) return;
-        if (!user) {
+        if (!hydrated || !user) {
             router.push("/login");
             return;
         }

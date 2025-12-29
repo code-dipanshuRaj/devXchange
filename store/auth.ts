@@ -50,44 +50,48 @@ export const useAuthStore = create<InterfaceOfAuthStore>()(
       },
       
       async verifySession(){
-        // Prevent multiple simultaneous verifications
+        // Prevent concurrent verification calls
         if (get().isVerifying) {
-          return false;
+          return get().session !== null;
         }
 
         set({isVerifying: true});
         
         try {
-          // First, try to get the current session
+          // First check if we have a session cookie by trying to get current session
           const session = await account.getSession({sessionId : "current"});
           
-          // Check if session is expired
+          // Verify session is not expired
           const now = new Date().getTime();
           const expiresAt = new Date(session.expire).getTime();
           
-          if (now >= expiresAt) {
-            // Session expired, clear everything
+          if (expiresAt <= now) {
+            // Session expired, clear state
             set({session: null, user: null, jwt: null, isVerifying: false});
             return false;
           }
 
-          // Session is valid, fetch fresh user data
+          // Session is valid, get user and JWT
           try {
             const [user, {jwt}] = await Promise.all([
               account.get<UserPrefs>(),
               account.createJWT()
             ]);
             
+            if(!user.prefs?.reputation) { 
+              await account.updatePrefs({reputation : 0} as any);
+            }
+            
             set({session, user, jwt, isVerifying: false});
             return true;
           } catch (error) {
-            // User fetch failed, session might be invalid
-            console.error("Failed to fetch user:", error);
+            // Failed to get user, session might be invalid
+            console.error("Failed to get user:", error);
             set({session: null, user: null, jwt: null, isVerifying: false});
             return false;
           }
         } catch (error) {
-          // Session doesn't exist or is invalid
+          // No valid session or session expired
           console.log("Session verification failed:", error);
           set({session: null, user: null, jwt: null, isVerifying: false});
           return false;
@@ -134,11 +138,11 @@ export const useAuthStore = create<InterfaceOfAuthStore>()(
       async logOut() {
         try {
           await account.deleteSessions();
-          set({session : null, user : null, jwt : null});
+          set({session : null, user : null, jwt : null, isVerifying: false});
         } catch (error) {
+          // Even if delete fails, clear local state
           console.log(error);
-          // Even if logout fails on server, clear local state
-          set({session : null, user : null, jwt : null});
+          set({session : null, user : null, jwt : null, isVerifying: false});
         }
       },
     })),

@@ -7,7 +7,8 @@ import slugify from "@/utils/slugify";
 
 export default function Header() {
     const { user, hydrated } = useAuthStore();
-    const [navItems, setNavItems] = React.useState([
+
+    const navItems = [
         {
             name: "Home",
             link: "/",
@@ -18,34 +19,16 @@ export default function Header() {
             link: "/questions",
             icon: <IconWorldQuestion className="h-4 w-4 text-neutral-500 dark:text-white" />,
         },
-    ]);
+    ];
 
-    React.useEffect(() => {
-        if (!hydrated) return;
-
-        const items = [
-            {
-                name: "Home",
-                link: "/",
-                icon: <IconHome className="h-4 w-4 text-neutral-500 dark:text-white" />,
-            },
-            {
-                name: "Questions",
-                link: "/questions",
-                icon: <IconWorldQuestion className="h-4 w-4 text-neutral-500 dark:text-white" />,
-            },
-        ];
-
-        if (user) {
-            items.push({
-                name: "Profile",
-                link: `/users/${user.$id}/${slugify(user.name)}`,
-                icon: <IconMessage className="h-4 w-4 text-neutral-500 dark:text-white" />,
-            });
-        }
-
-        setNavItems(items);
-    }, [user, hydrated]);
+    // Only add profile link if store is hydrated and user exists
+    if (hydrated && user) {
+        navItems.push({
+            name: "Profile",
+            link: `/users/${user.$id}/${slugify(user.name)}`,
+            icon: <IconMessage className="h-4 w-4 text-neutral-500 dark:text-white" />,
+        });
+    }
 
     return (
         <div className="relative w-full">

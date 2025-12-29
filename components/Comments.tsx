@@ -95,7 +95,7 @@ const Comments = ({
                                 {convertDateToRelativeTime(new Date(comment.$createdAt))}
                             </span>
                         </p>
-                        {user?.$id === comment.authorId ? (
+                        {hydrated && user?.$id === comment.authorId ? (
                             <button
                                 onClick={() => deleteComment(comment.$id)}
                                 className="shrink-0 text-red-500 hover:text-red-600"

@@ -5,37 +5,32 @@ import { useAuthStore } from "@/store/auth";
 import { WavyBackground } from "@/components/ui/wavy-background";
 
 export default function Layout({children} : {children : React.ReactNode}) {
-  const {session, user, hydrated, isVerifying, verifySession} = useAuthStore();
+  const {hydrated, session, user, verifySession, isVerifying} = useAuthStore();
   const router = useRouter();
   const [isChecking, setIsChecking] = React.useState(true);
   
   React.useEffect(() => {
-    const checkAuth = async () => {
-      // Wait for store to hydrate
-      if (!hydrated) {
-        return;
-      }
+    if (!hydrated) {
+      return;
+    }
 
-      // If we have session/user, verify they're still valid
+    const checkAuth = async () => {
+      // If we have session/user, verify it's still valid
       if (session || user) {
-        setIsChecking(true);
         const isValid = await verifySession();
-        setIsChecking(false);
-        
-        // If session is valid, redirect to home
         if (isValid) {
           router.push("/");
           return;
         }
       }
-
+      
       setIsChecking(false);
     };
 
     checkAuth();
   }, [hydrated, session, user, verifySession, router]);
 
-  // Show loading state while checking
+  // Show loading while checking
   if (!hydrated || isChecking || isVerifying) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -47,8 +42,8 @@ export default function Layout({children} : {children : React.ReactNode}) {
     );
   }
 
-  // If we have valid session, don't render auth pages
-  if (session && user) {
+  // If user is authenticated, don't render auth pages
+  if (session || user) {
     return null;
   }
   

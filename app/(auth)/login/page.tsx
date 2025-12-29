@@ -50,9 +50,11 @@ export default function Login() {
         const loginResponse = await logIn(email.toString(), password.toString());
         if (loginResponse.error) {
             setError(() => loginResponse.error!.message);
+            setIsLoading(() => false);
+        } else {
+            // Redirect on success
+            window.location.href = "/";
         }
-
-        setIsLoading(() => false);
     };
 
     return (

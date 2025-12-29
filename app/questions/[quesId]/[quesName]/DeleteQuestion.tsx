@@ -9,14 +9,9 @@ import React from "react";
 
 const DeleteQuestion = ({ questionId, authorId }: { questionId: string; authorId: string }) => {
     const router = useRouter();
-    const { user, hydrated } = useAuthStore();
+    const { user } = useAuthStore();
 
     const deleteQuestion = async () => {
-        if (!hydrated || !user || user.$id !== authorId) {
-            window.alert("You don't have permission to delete this question");
-            return;
-        }
-
         try {
             await tableDB.deleteRow({databaseId : db, tableId : questionsCollection, rowId : questionId});
 
@@ -26,16 +21,14 @@ const DeleteQuestion = ({ questionId, authorId }: { questionId: string; authorId
         }
     };
 
-    if (!hydrated || !user || user.$id !== authorId) return null;
-
-    return (
+    return user?.$id === authorId ? (
         <button
             className="flex h-10 w-10 items-center justify-center rounded-full border border-red-500 p-1 text-red-500 duration-200 hover:bg-red-500/10"
             onClick={deleteQuestion}
         >
             <IconTrash className="h-4 w-4" />
         </button>
-    );
+    ) : null;
 };
 
 export default DeleteQuestion;
