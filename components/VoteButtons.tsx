@@ -30,19 +30,29 @@ const VoteButtons = ({
 
     React.useEffect(() => {
         (async () => {
-            if (user) {
-                const response = await tableDB.listRows({databaseId : db, tableId : votesCollection, queries : [
-                    Query.equal("type", type),
-                    Query.equal("typeId", id),
-                    Query.equal("votedById", user.$id),
-                ]});
-                setVotedDocument(response.rows[0] || null);    
+            if (user && user.$id) {
+                try {
+                    const response = await tableDB.listRows({databaseId : db, tableId : votesCollection, queries : [
+                        Query.equal("type", type),
+                        Query.equal("typeId", id),
+                        Query.equal("votedById", user.$id),
+                    ]});
+                    setVotedDocument(response.rows[0] || null);
+                } catch (error) {
+                    console.error("Failed to fetch vote document:", error);
+                    setVotedDocument(null);
+                }
+            } else {
+                setVotedDocument(null);
             }
         })();
     }, [user, id, type]);
 
     const toggleUpvote = async () => {
-        if (!user) return router.push("/login");
+        if (!user || !user.$id) {
+            router.push("/login");
+            return;
+        }
 
         if (votedDocument === undefined) return;
 
@@ -69,7 +79,10 @@ const VoteButtons = ({
     };
 
     const toggleDownvote = async () => {
-        if (!user) return router.push("/login");
+        if (!user || !user.$id) {
+            router.push("/login");
+            return;
+        }
 
         if (votedDocument === undefined) return;
 

@@ -38,9 +38,15 @@ const slugs = [
     "sonarqube",
     "figma",
 ];
+const images = slugs.map(
+    (slug) => `https://cdn.simpleicons.org/${slug}/${slug}`
+  )
 
 const HeroSectionHeader = () => {
-    const { session } = useAuthStore();
+    const { session, user, hydrated } = useAuthStore();
+
+    // Wait for hydration before showing auth-dependent content
+    const isAuthenticated = hydrated && session && user;
 
     return (
         <div className="container mx-auto px-4">
@@ -55,14 +61,14 @@ const HeroSectionHeader = () => {
                 <div className="flex items-center justify-center">
                     <div className="space-y-4 text-center">
                         <h1 className="pointer-events-none z-10 whitespace-pre-wrap bg-gradient-to-b from-[#ffd319] via-[#ff2975] to-[#8c1eff] bg-clip-text text-center text-7xl font-bold leading-none tracking-tighter text-transparent">
-                            RiverFlow
+                            DevXchange
                         </h1>
                         <p className="text-center text-xl font-bold leading-none tracking-tighter">
                             Ask questions, share knowledge, and collaborate with developers
                             worldwide. Join our community and enhance your coding skills!
                         </p>
                         <div className="flex items-center justify-center gap-4">
-                            {session ? (
+                            {isAuthenticated ? (
                                 <Link href="/questions/ask">
                                     <ShimmerButton className="shadow-2xl">
                                         <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
@@ -93,7 +99,7 @@ const HeroSectionHeader = () => {
                 </div>
                 <div className="flex items-center justify-center">
                     <div className="relative max-w-[32rem] overflow-hidden">
-                        <IconCloud icons={slugs} />
+                        <IconCloud images={images} />
                     </div>
                 </div>
             </div>

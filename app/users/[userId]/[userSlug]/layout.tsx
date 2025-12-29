@@ -1,6 +1,6 @@
 import { avatars } from "@/models/client/config";
 import { users } from "@/models/server/config";
-import { UserPrefs } from "@/store/Auth";
+import { UserPrefs } from "@/store/auth";
 import convertDateToRelativeTime from "@/utils/relativeTime";
 import React from "react";
 import EditButton from "./EditButton";
@@ -14,7 +14,8 @@ const Layout = async ({
     children: React.ReactNode;
     params: { userId: string; userSlug: string };
 }) => {
-    const user = await users.get<UserPrefs>(params.userId);
+    const { userId, userSlug } = await params;
+    const user = await users.get<UserPrefs>({ userId });
 
     return (
         <div className="container mx-auto space-y-4 px-4 pb-20 pt-32">
@@ -22,7 +23,7 @@ const Layout = async ({
                 <div className="w-40 shrink-0">
                     <picture className="block w-full">
                         <img
-                            src={avatars.getInitials(user.name, 200, 200).href}
+                            src={avatars.getInitials({name : user.name, width : 200, height : 200})}
                             alt={user.name}
                             className="h-full w-full rounded-xl object-cover"
                         />

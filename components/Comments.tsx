@@ -33,11 +33,11 @@ const Comments = ({
     const [comments, setComments] = React.useState(_comments);
 
     const [newComment, setNewComment] = React.useState("");
-    const { user } = useAuthStore();
+    const { user, hydrated } = useAuthStore();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!newComment || !user) return;
+        if (!newComment || !user || !user.$id) return;
 
         try {
             const response = await tableDB.createRow({
@@ -95,7 +95,7 @@ const Comments = ({
                                 {convertDateToRelativeTime(new Date(comment.$createdAt))}
                             </span>
                         </p>
-                        {user?.$id === comment.authorId ? (
+                        {hydrated && user && user.$id === comment.authorId ? (
                             <button
                                 onClick={() => deleteComment(comment.$id)}
                                 className="shrink-0 text-red-500 hover:text-red-600"

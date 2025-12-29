@@ -1,23 +1,37 @@
 "use client";
 
 import QuestionForm from "@/components/QuestionForm";
-import { useAuthStore } from "@/store/Auth";
+import { useAuthStore } from "@/store/auth";
 import slugify from "@/utils/slugify";
 import { Models } from "appwrite";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const EditQues = ({ question }: { question: Models.Document }) => {
-    const { user } = useAuthStore();
+// type need to be fixed
+const EditQues = ({ question }: { question: any }) => {
+
+    const { user, hydrated } = useAuthStore();
     const router = useRouter();
 
     React.useEffect(() => {
-        if (question.authorId !== user?.$id) {
+        if (!hydrated) return;
+        
+        if (!user || question.authorId !== user.$id) {
             router.push(`/questions/${question.$id}/${slugify(question.title)}`);
         }
-    }, []);
+    }, [hydrated, user, question.authorId, question.$id, question.title, router]);
 
-    if (user?.$id !== question.authorId) return null;
+    // Wait for hydration and verify user matches
+    if (!hydrated || !user || user.$id !== question.authorId) {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <div className="text-center">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+                    <p className="mt-4 text-sm text-gray-500">Loading...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="block pb-20 pt-32">

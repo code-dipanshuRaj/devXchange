@@ -42,17 +42,24 @@ export function IconCloud({ icons, images }: IconCloudProps) {
   const iconCanvasesRef = useRef<HTMLCanvasElement[]>([])
   const imagesLoadedRef = useRef<boolean[]>([])
 
+  // Configurable sizes for icon canvas and sphere radius
+  const ICON_SIZE = 92
+  const SPHERE_SCALE = 180
+
   // Create icon canvases once when icons/images change
   useEffect(() => {
     if (!icons && !images) return
+
+    const ICON_SIZE = 72
+    const SPHERE_SCALE = 140
 
     const items = icons || images || []
     imagesLoadedRef.current = new Array(items.length).fill(false)
 
     const newIconCanvases = items.map((item, index) => {
       const offscreen = document.createElement("canvas")
-      offscreen.width = 40
-      offscreen.height = 40
+      offscreen.width = ICON_SIZE
+      offscreen.height = ICON_SIZE
       const offCtx = offscreen.getContext("2d")
 
       if (offCtx) {
@@ -66,21 +73,42 @@ export function IconCloud({ icons, images }: IconCloudProps) {
 
             // Create circular clipping path
             offCtx.beginPath()
-            offCtx.arc(20, 20, 20, 0, Math.PI * 2)
+            offCtx.arc(ICON_SIZE / 2, ICON_SIZE / 2, ICON_SIZE / 2, 0, Math.PI * 2)
             offCtx.closePath()
             offCtx.clip()
 
             // Draw the image
-            offCtx.drawImage(img, 0, 0, 40, 40)
+            offCtx.drawImage(img, 0, 0, ICON_SIZE, ICON_SIZE)
 
             imagesLoadedRef.current[index] = true
           }
         } else {
-          // Handle SVG icons
-          offCtx.scale(0.4, 0.4)
-          const svgString = renderToString(item as React.ReactElement)
+          // Handle SVG icons or plain string slugs
           const img = new Image()
-          img.src = "data:image/svg+xml;base64," + btoa(svgString)
+          img.crossOrigin = "anonymous"
+
+          if (typeof item === "string") {
+            // Try fetching official simple-icons SVG from CDN
+            const slug = item.toLowerCase().replace(/\s+/g, "")
+            fetch(`https://cdn.simpleicons.org/${slug}`)
+              .then((res) => {
+                if (!res.ok) throw new Error("not found")
+                return res.text()
+              })
+              .then((svgText) => {
+                img.src = "data:image/svg+xml;base64," + btoa(svgText)
+              })
+              .catch(() => {
+                // Fallback to simple label SVG if fetch fails
+                const label = slug.replace(/[^a-z0-9]/gi, "").slice(0, 10)
+                const svgString = `<svg xmlns='http://www.w3.org/2000/svg' width='${ICON_SIZE}' height='${ICON_SIZE}'><rect width='100%' height='100%' rx='12' fill='#0f172a'/><text x='50%' y='50%' fill='white' font-size='12' font-family='Arial, Helvetica, sans-serif' dominant-baseline='middle' text-anchor='middle'>${label}</text></svg>`
+                img.src = "data:image/svg+xml;base64," + btoa(svgString)
+              })
+          } else {
+            const svgString = renderToString(item as React.ReactElement)
+            img.src = "data:image/svg+xml;base64," + btoa(svgString)
+          }
+
           img.onload = () => {
             offCtx.clearRect(0, 0, offscreen.width, offscreen.height)
             offCtx.drawImage(img, 0, 0)

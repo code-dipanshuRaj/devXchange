@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/auth";
 import slugify from "@/utils/slugify";
 
 export default function Header() {
-    const { user } = useAuthStore();
+    const { user, hydrated } = useAuthStore();
 
     const navItems = [
         {
@@ -21,7 +21,8 @@ export default function Header() {
         },
     ];
 
-    if (user)
+    // Only add profile link if store is hydrated and user exists
+    if (hydrated && user)
         navItems.push({
             name: "Profile",
             link: `/users/${user.$id}/${slugify(user.name)}`,

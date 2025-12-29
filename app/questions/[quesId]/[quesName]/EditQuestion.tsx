@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuthStore } from "@/store/Auth";
+import { useAuthStore } from "@/store/auth";
 import slugify from "@/utils/slugify";
 import { IconEdit } from "@tabler/icons-react";
 import Link from "next/link";
@@ -15,9 +15,12 @@ const EditQuestion = ({
     questionTitle: string;
     authorId: string;
 }) => {
-    const { user } = useAuthStore();
+    const { user, hydrated } = useAuthStore();
 
-    return user?.$id === authorId ? (
+    // Only show edit button if hydrated and user matches
+    if (!hydrated || !user || user.$id !== authorId) return null;
+
+    return (
         <Link
             href={`/questions/${questionId}/${slugify(questionTitle)}/edit`}
             className="flex h-10 w-10 items-center justify-center rounded-full border p-1 duration-200 hover:bg-white/10"

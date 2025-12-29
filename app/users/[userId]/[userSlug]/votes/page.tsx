@@ -1,6 +1,6 @@
 import Pagination from "@/components/Pagination";
-import { answerCollection, db, questionCollection, voteCollection } from "@/models/name";
-import { databases } from "@/models/server/config";
+import { answersCollection, db, questionsCollection, votesCollection } from "@/models/name";
+import { tableDB } from "@/models/server/config";
 import convertDateToRelativeTime from "@/utils/relativeTime";
 import slugify from "@/utils/slugify";
 import Link from "next/link";
@@ -14,26 +14,27 @@ const Page = async ({
     params: { userId: string; userSlug: string };
     searchParams: { page?: string; voteStatus?: "upvoted" | "downvoted" };
 }) => {
-    searchParams.page ||= "1";
+    const {userId, userSlug} = await params;
+    console.log(userId)
+    const searchparams = await searchParams;
+    const page = searchparams.page ?? "1";
 
     const query = [
-        Query.equal("votedById", params.userId),
+        Query.equal("votedById", userId),
         Query.orderDesc("$createdAt"),
-        Query.offset((+searchParams.page - 1) * 25),
+        Query.offset((Number(page) - 1) * 25),
         Query.limit(25),
     ];
 
-    if (searchParams.voteStatus) query.push(Query.equal("voteStatus", searchParams.voteStatus));
+    if (searchparams.voteStatus) query.push(Query.equal("voteStatus", searchparams.voteStatus));
 
-    const votes = await databases.listDocuments(db, voteCollection, query);
+    const votes = await tableDB.listRows({databaseId : db, tableId : votesCollection, queries : query});
 
-    votes.documents = await Promise.all(
-        votes.documents.map(async vote => {
+    votes.rows = await Promise.all(
+        votes.rows.map(async vote => {
             const questionOfTypeQuestion =
                 vote.type === "question"
-                    ? await databases.getDocument(db, questionCollection, vote.typeId, [
-                          Query.select(["title"]),
-                      ])
+                    ? await tableDB.getRow({databaseId : db, tableId : questionsCollection, rowId : vote.typeId, queries : [Query.select(["title"])],})
                     : null;
 
             if (questionOfTypeQuestion) {
@@ -43,13 +44,13 @@ const Page = async ({
                 };
             }
 
-            const answer = await databases.getDocument(db, answerCollection, vote.typeId);
-            const questionOfTypeAnswer = await databases.getDocument(
-                db,
-                questionCollection,
-                answer.questionId,
-                [Query.select(["title"])]
-            );
+            const answer = await tableDB.getRow({databaseId : db, tableId : answersCollection, rowId : vote.typeId});
+            const questionOfTypeAnswer = await tableDB.getRow({
+                databaseId : db,
+                tableId : questionsCollection,
+                rowId : answer.questionId,
+                queries : [Query.select(["title"])]
+            });
 
             return {
                 ...vote,
@@ -65,9 +66,9 @@ const Page = async ({
                 <ul className="flex gap-1">
                     <li>
                         <Link
-                            href={`/users/${params.userId}/${params.userSlug}/votes`}
+                            href={`/users/${userId}/${userSlug}/votes`}
                             className={`block w-full rounded-full px-3 py-0.5 duration-200 ${
-                                !searchParams.voteStatus ? "bg-white/20" : "hover:bg-white/20"
+                                !searchparams.voteStatus ? "bg-white/20" : "hover:bg-white/20"
                             }`}
                         >
                             All
@@ -75,9 +76,9 @@ const Page = async ({
                     </li>
                     <li>
                         <Link
-                            href={`/users/${params.userId}/${params.userSlug}/votes?voteStatus=upvoted`}
+                            href={`/users/${userId}/${userSlug}/votes?voteStatus=upvoted`}
                             className={`block w-full rounded-full px-3 py-0.5 duration-200 ${
-                                searchParams?.voteStatus === "upvoted"
+                                searchparams?.voteStatus === "upvoted"
                                     ? "bg-white/20"
                                     : "hover:bg-white/20"
                             }`}
@@ -87,9 +88,9 @@ const Page = async ({
                     </li>
                     <li>
                         <Link
-                            href={`/users/${params.userId}/${params.userSlug}/votes?voteStatus=downvoted`}
+                            href={`/users/${userId}/${userSlug}/votes?voteStatus=downvoted`}
                             className={`block w-full rounded-full px-3 py-0.5 duration-200 ${
-                                searchParams?.voteStatus === "downvoted"
+                                searchparams?.voteStatus === "downvoted"
                                     ? "bg-white/20"
                                     : "hover:bg-white/20"
                             }`}
@@ -100,7 +101,7 @@ const Page = async ({
                 </ul>
             </div>
             <div className="mb-4 max-w-3xl space-y-6">
-                {votes.documents.map(vote => (
+                {votes.rows.map(vote => (
                     <div
                         key={vote.$id}
                         className="rounded-xl border border-white/40 p-4 duration-200 hover:bg-white/10"

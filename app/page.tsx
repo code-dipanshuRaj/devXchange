@@ -1,65 +1,109 @@
-import Image from "next/image";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import HeroSection from "./components/HeroSection";
+import LatestQuestions from "./components/LatestQuestions";
+import TopContributers from "./components/TopContributers";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
+import Link from "next/link";
+
+const features = [
+  {
+    title: "Ask great questions",
+    desc: "Clear templates and community guidelines help you ask questions that get fast answers.",
+    icon: (
+      <svg className="h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2v6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M20 12a8 8 0 11-16 0 8 8 0 0116 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+    ),
+  },
+  {
+    title: "Share knowledge",
+    desc: "Publish answers and earn reputation while helping others solve problems.",
+    icon: (
+      <svg className="h-8 w-8 text-green-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a1 1 0 01-1 1H9l-4 2V6a1 1 0 011-1h14a1 1 0 011 1v9z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+    ),
+  },
+  {
+    title: "Collaborate & Learn",
+    desc: "Follow tags, connect with contributors, and stay up-to-date with curated content.",
+    icon: (
+      <svg className="h-8 w-8 text-pink-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 20v-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M7 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+    ),
+  },
+];
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen w-full bg-white dark:bg-black text-neutral-900 dark:text-white">
+      <Header />
+
+      {/* HERO */}
+      <section aria-label="Hero" className="relative w-full overflow-hidden">
+        <HeroSection />
+      </section>
+
+      {/* FEATURES */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold">Built for developers</h2>
+          <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-300">Ask questions, share knowledge, and grow with an active developer community.</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {features.map((f) => (
+            <article key={f.title} className="group rounded-2xl border border-white/10 p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-4">
+                <div className="rounded-full bg-white/5 p-3">{f.icon}</div>
+                <h3 className="text-lg font-semibold">{f.title}</h3>
+              </div>
+              <p className="mt-4 text-sm text-neutral-600 dark:text-neutral-300">{f.desc}</p>
+              <div className="mt-6">
+                <Link href="/register">
+                  <ShimmerButton shimmerColor="#ffffff">
+                    <span className="text-sm font-medium text-white">Get started</span>
+                  </ShimmerButton>
+                </Link>
+              </div>
+            </article>
+          ))}
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* LATEST + CONTRIBUTORS */}
+      <section className="container mx-auto px-4 py-12">
+        <div className="grid gap-8 md:grid-cols-3">
+          <div className="md:col-span-2">
+            <h3 className="text-2xl font-bold mb-6">Latest Questions</h3>
+            <LatestQuestions />
+          </div>
+
+          <aside>
+            <h3 className="text-2xl font-bold mb-6">Top Contributors</h3>
+            <TopContributers />
+          </aside>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16">
+        <div className="container mx-auto px-4 text-center">
+          <div className="mx-auto max-w-2xl rounded-2xl bg-gradient-to-r from-[#ffd319] via-[#ff2975] to-[#8c1eff] p-10 text-white shadow-2xl">
+            <h4 className="text-3xl font-bold">Join DevXchange — Connect with developers</h4>
+            <p className="mt-3 text-lg">Create an account, ask your first question and start contributing.</p>
+            <div className="mt-6 flex items-center justify-center gap-4">
+              <Link href="/register">
+                <ShimmerButton shimmerColor="#ffffff">
+                  <span className="text-sm font-medium text-white">Sign up</span>
+                </ShimmerButton>
+              </Link>
+
+              <Link href="/questions/ask" className="rounded-full border border-white/20 px-6 py-3 text-white">
+                Ask a question
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </main>
   );
 }

@@ -1,15 +1,16 @@
 "use client";
 
-import { useAuthStore } from "@/store/Auth";
+import { useAuthStore } from "@/store/auth";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import React from "react";
 
 const EditButton = () => {
     const { userId, userSlug } = useParams();
-    const { user } = useAuthStore();
+    const { user, hydrated } = useAuthStore();
 
-    if (user?.$id !== userId) return null;
+    // Wait for hydration and check if user matches
+    if (!hydrated || !user || user.$id !== userId) return null;
 
     return (
         <Link

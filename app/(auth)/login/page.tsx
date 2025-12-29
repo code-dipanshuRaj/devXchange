@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
-import { useAuthStore } from "@/store/auth";
+import { getAuthStore } from "@/store/auth";
 import Link from "next/link";
 
 const BottomGradient = () => {
@@ -28,7 +28,7 @@ const LabelInputContainer = ({
 };
 
 export default function Login() {
-    const { logIn } = useAuthStore();
+    const { logIn } = getAuthStore();
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState("");
 

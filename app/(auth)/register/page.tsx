@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
-import { useAuthStore } from "@/store/auth";
+import { getAuthStore } from "@/store/auth";
 import Link from "next/link";
 
 const BottomGradient = () => {
@@ -34,7 +34,7 @@ export default function Register(){
     e.preventDefault();
     
     const formData = new FormData(e.target as HTMLFormElement)
-    const name = formData.get("name") as string;
+    const name = formData.get("firstname") as string + " " + (formData.get("lastname") as string);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     if(!email || !password || !name) {
@@ -44,7 +44,7 @@ export default function Register(){
 
     setLoading(true);
     setError(null);
-    const {signIn} = useAuthStore();
+    const {signIn} = getAuthStore();
     const {success, error} = await signIn(email, password, name);
     setLoading(false);
     if(!success) setError(error?.message || "Something went wrong");
@@ -89,7 +89,7 @@ export default function Register(){
                 </LabelInputContainer>
                 <LabelInputContainer className="mb-4">
                     <Label htmlFor="password">Password</Label>
-                    <Input className="text-black"  id="password" name="password" placeholder="••••••••" type="password" />
+                    <Input className="text-grey"  id="password" name="password" placeholder="••••••••" type="password" />
                 </LabelInputContainer>
 
                 <button

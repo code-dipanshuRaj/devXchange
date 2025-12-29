@@ -13,7 +13,11 @@ import Link from "next/link";
 import { IconTrash } from "@tabler/icons-react";
 
 type AnswerWithAuthor = Models.Row & {
-    author : Models.User<UserPrefs>,
+    author : {
+        $id: string;
+        name: string;
+        reputation: number;
+    },
     content: string,
     authorId: string,
     upvotesDocuments: Models.RowList<Models.Row>,
@@ -130,7 +134,7 @@ const Answers = ({
                                     {answer.author.name}
                                 </Link>
                                 <p>
-                                    <strong>{answer.author.prefs.reputation}</strong>
+                                    <strong>{answer.author.reputation}</strong>
                                 </p>
                             </div>
                         </div>

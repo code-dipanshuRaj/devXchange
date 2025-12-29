@@ -1,8 +1,8 @@
 "use client";
 
-import { databases } from "@/models/client/config";
-import { db, questionCollection } from "@/models/name";
-import { useAuthStore } from "@/store/Auth";
+import { tableDB } from "@/models/client/config";
+import { db, questionsCollection } from "@/models/name";
+import { useAuthStore } from "@/store/auth";
 import { IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -13,7 +13,7 @@ const DeleteQuestion = ({ questionId, authorId }: { questionId: string; authorId
 
     const deleteQuestion = async () => {
         try {
-            await databases.deleteDocument(db, questionCollection, questionId);
+            await tableDB.deleteRow({databaseId : db, tableId : questionsCollection, rowId : questionId});
 
             router.push("/questions");
         } catch (error: any) {
