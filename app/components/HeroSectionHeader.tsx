@@ -43,10 +43,14 @@ const images = slugs.map(
   )
 
 const HeroSectionHeader = () => {
-    const { session, user, hydrated } = useAuthStore();
+    const { session, hydrated } = useAuthStore();
+    const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 
-    // Wait for hydration before showing auth-dependent content
-    const isAuthenticated = hydrated && session && user;
+    React.useEffect(() => {
+        if (hydrated) {
+            setIsAuthenticated(!!session);
+        }
+    }, [session, hydrated]);
 
     return (
         <div className="container mx-auto px-4">

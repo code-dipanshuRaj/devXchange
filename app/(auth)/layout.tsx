@@ -16,11 +16,14 @@ export default function Layout({children} : {children : React.ReactNode}) {
         return;
       }
 
-      // If we have a session, verify it's still valid
-      if (session) {
+      // If we have session/user, verify they're still valid
+      if (session || user) {
         setIsChecking(true);
         const isValid = await verifySession();
-        if (isValid && user) {
+        setIsChecking(false);
+        
+        // If session is valid, redirect to home
+        if (isValid) {
           router.push("/");
           return;
         }
@@ -44,7 +47,7 @@ export default function Layout({children} : {children : React.ReactNode}) {
     );
   }
 
-  // If user is authenticated, don't show auth pages
+  // If we have valid session, don't render auth pages
   if (session && user) {
     return null;
   }

@@ -51,7 +51,7 @@ type FormState = {
 };
 
 const QuestionForm = ({ question } : { question?: QuestionWithFields }) => {
-    const { user } = useAuthStore();
+    const { user, hydrated } = useAuthStore();
     const [tag, setTag] = React.useState("");
     const router = useRouter();
 
@@ -64,19 +64,16 @@ const QuestionForm = ({ question } : { question?: QuestionWithFields }) => {
     });
 
     React.useEffect(() => {
-        if (!user?.$id) {
-            router.push("/login");
-            return;
-        }
+        if (!hydrated) return;
         
         setFormData({
             title: String(question?.title || ""),
             content: String(question?.content || ""),
-            authorId: user.$id,
+            authorId: user?.$id,
             tags: new Set((question?.tags || []) as string[]),
             attachment: null,
         });
-    }, [question, user?.$id, router]);
+    }, [question, user?.$id, hydrated]);
 
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState("");
@@ -112,17 +109,13 @@ const QuestionForm = ({ question } : { question?: QuestionWithFields }) => {
     };
 
     const create = async () => {
-        // Attachment is optional
-        let attachmentId: string | undefined;
-        
-        if (formData.attachment) {
-            const storageResponse = await storage.createFile({
-                bucketId: questionAttachmentsBucket,
-                fileId: ID.unique(),
-                file: formData.attachment
-            });
-            attachmentId = storageResponse.$id;
-        }
+        if (!formData.attachment) throw new Error("Please upload an image");
+
+        const storageResponse = await storage.createFile({
+            bucketId: questionAttachmentsBucket,
+            fileId: ID.unique(),
+            file: formData.attachment
+        });
 
         const response = await tableDB.createRow({
             databaseId : db,
@@ -133,7 +126,7 @@ const QuestionForm = ({ question } : { question?: QuestionWithFields }) => {
             content: formData.content,
             authorId: formData.authorId,
             tags: Array.from(formData.tags),
-            ...(attachmentId && { attachmentId }),
+            attachmentId: storageResponse.$id,
         }});
 
         loadConfetti();
@@ -182,9 +175,7 @@ const QuestionForm = ({ question } : { question?: QuestionWithFields }) => {
     const submit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Verify user is still authenticated
-        if (!user || !user.$id) {
-            setError(() => "You must be logged in to submit a question");
+        if (!hydrated || !user) {
             router.push("/login");
             return;
         }

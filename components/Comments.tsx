@@ -37,7 +37,7 @@ const Comments = ({
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!newComment || !user || !user.$id) return;
+        if (!hydrated || !newComment || !user) return;
 
         try {
             const response = await tableDB.createRow({
@@ -95,7 +95,7 @@ const Comments = ({
                                 {convertDateToRelativeTime(new Date(comment.$createdAt))}
                             </span>
                         </p>
-                        {hydrated && user && user.$id === comment.authorId ? (
+                        {user?.$id === comment.authorId ? (
                             <button
                                 onClick={() => deleteComment(comment.$id)}
                                 className="shrink-0 text-red-500 hover:text-red-600"

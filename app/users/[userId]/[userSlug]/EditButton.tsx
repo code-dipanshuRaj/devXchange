@@ -9,7 +9,6 @@ const EditButton = () => {
     const { userId, userSlug } = useParams();
     const { user, hydrated } = useAuthStore();
 
-    // Wait for hydration and check if user matches
     if (!hydrated || !user || user.$id !== userId) return null;
 
     return (

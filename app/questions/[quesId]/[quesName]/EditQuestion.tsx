@@ -17,7 +17,6 @@ const EditQuestion = ({
 }) => {
     const { user, hydrated } = useAuthStore();
 
-    // Only show edit button if hydrated and user matches
     if (!hydrated || !user || user.$id !== authorId) return null;
 
     return (
@@ -27,7 +26,7 @@ const EditQuestion = ({
         >
             <IconEdit className="h-4 w-4" />
         </Link>
-    ) : null;
+    );
 };
 
 export default EditQuestion;

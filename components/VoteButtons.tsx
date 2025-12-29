@@ -25,31 +25,31 @@ const VoteButtons = ({
     const [votedDocument, setVotedDocument] = React.useState<any>(undefined); // undefined means not fetched yet
     const [voteResult, setVoteResult] = React.useState<number>(upvotes.total - downvotes.total);
 
-    const { user } = useAuthStore();
+    const { user, hydrated } = useAuthStore();
     const router = useRouter();
 
     React.useEffect(() => {
         (async () => {
-            if (user && user.$id) {
-                try {
-                    const response = await tableDB.listRows({databaseId : db, tableId : votesCollection, queries : [
-                        Query.equal("type", type),
-                        Query.equal("typeId", id),
-                        Query.equal("votedById", user.$id),
-                    ]});
-                    setVotedDocument(response.rows[0] || null);
-                } catch (error) {
-                    console.error("Failed to fetch vote document:", error);
-                    setVotedDocument(null);
-                }
+            // Wait for hydration before checking user
+            if (!hydrated) return;
+            
+            if (user) {
+                const response = await tableDB.listRows({databaseId : db, tableId : votesCollection, queries : [
+                    Query.equal("type", type),
+                    Query.equal("typeId", id),
+                    Query.equal("votedById", user.$id),
+                ]});
+                setVotedDocument(response.rows[0] || null);    
             } else {
+                // No user, set to null (not undefined) to indicate checked
                 setVotedDocument(null);
             }
         })();
-    }, [user, id, type]);
+    }, [user, id, type, hydrated]);
 
     const toggleUpvote = async () => {
-        if (!user || !user.$id) {
+        if (!hydrated) return;
+        if (!user) {
             router.push("/login");
             return;
         }
@@ -79,7 +79,8 @@ const VoteButtons = ({
     };
 
     const toggleDownvote = async () => {
-        if (!user || !user.$id) {
+        if (!hydrated) return;
+        if (!user) {
             router.push("/login");
             return;
         }
