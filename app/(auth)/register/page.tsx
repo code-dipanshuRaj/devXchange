@@ -48,8 +48,15 @@ export default function Register(){
     const {signIn} = getAuthStore();
     const {success, error} = await signIn(email, password, name);
     setLoading(false);
-    if(!success) setError(error?.message || "Something went wrong");
-    else router.push("/");
+    if(!success) {
+      setError(error?.message || "Something went wrong");
+    } else {
+      // Wait a bit for state to update, then redirect
+      // Use window.location.href for a full page reload to ensure state is synced
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 100);
+    }
   }  
       return (
         <div className="mx-auto w-full max-w-md rounded-none border border-solid border-white/30 bg-white p-4 shadow-input dark:bg-black md:rounded-2xl md:p-8">

@@ -29,10 +29,25 @@ const LabelInputContainer = ({
 };
 
 export default function Login() {
-    const { logIn } = getAuthStore();
+    const { logIn, user, hydrated, verifySession } = getAuthStore();
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState("");
     const router = useRouter();
+
+    // Check if user is already logged in
+    React.useEffect(() => {
+        const checkAuth = async () => {
+            if (hydrated && user) {
+                // Verify session is still valid
+                const isValid = await verifySession();
+                if (isValid) {
+                    router.push("/");
+                }
+            }
+        };
+        checkAuth();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hydrated]); // Only check once on mount, not when user changes
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -46,13 +61,6 @@ export default function Login() {
             return;
         }
 
-        // If a session already exists, verify and redirect instead of creating new
-        const already = await getAuthStore().verifySession();
-        if (already) {
-            router.push("/")
-            return;
-        }
-
         setIsLoading(() => true);
         setError(() => "");
 
@@ -61,8 +69,11 @@ export default function Login() {
             setError(() => loginResponse.error!.message);
             setIsLoading(() => false);
         } else {
-            // Redirect on success
-            window.location.href = "/";
+            // Wait a bit for state to update, then redirect
+            // Use window.location.href for a full page reload to ensure state is synced
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 100);
         }
     };
 

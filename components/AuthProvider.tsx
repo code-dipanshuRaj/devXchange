@@ -9,26 +9,27 @@ import { useAuthStore } from "@/store/auth";
  */
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const { hydrated, session, user, verifySession } = useAuthStore();
-  const [hasVerified, setHasVerified] = React.useState(false);
+  const hasVerifiedRef = React.useRef(false);
 
   React.useEffect(() => {
     const initializeAuth = async () => {
       // Wait for store to hydrate from localStorage
-      if (!hydrated) {
+      if (!hydrated || hasVerifiedRef.current) {
         return;
       }
 
-      // Only verify if we have a session or user in store
+      // Only verify once on initial load if we have a session or user in store
       // This prevents unnecessary API calls on first visit
       if (session || user) {
         await verifySession();
       }
 
-      setHasVerified(true);
+      hasVerifiedRef.current = true;
     };
 
     initializeAuth();
-  }, [hydrated, session, user, verifySession]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated]); // Only depend on hydrated to prevent infinite loops
 
   // Don't block rendering, but verify in background
   return <>{children}</>;

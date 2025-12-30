@@ -105,13 +105,36 @@ export const useAuthStore = create<InterfaceOfAuthStore>()(
       
       async signIn(email, password, name) {
         try {
-          const user  =  await account.create({
+          // Delete any existing sessions first to prevent "session already exists" error
+          try {
+            await account.deleteSessions();
+          } catch (e) {
+            // Ignore errors if no sessions exist
+          }
+
+          // Create the account
+          const user = await account.create({
             userId: ID.unique(),
             email,
             password,
             name
-          })
+          });
           console.log("User created:", user);
+          
+          // Automatically log in the user after registration
+          const session = await account.createEmailPasswordSession({email, password});
+          const [userData, {jwt}] = await Promise.all([
+            account.get<UserPrefs>(),
+            account.createJWT()
+          ]);
+          
+          if(!userData.prefs?.reputation) { 
+            await account.updatePrefs({reputation : 0} as any);
+          }
+          
+          // Update store with session, user, and JWT
+          set({session, user: userData, jwt});
+          
           return {success : true}
         } catch (error) {
           return {
@@ -122,16 +145,53 @@ export const useAuthStore = create<InterfaceOfAuthStore>()(
       
       async logIn(email, password) {
         try {
+          // First, try to get existing session and verify it
+          let existingSession = null;
+          let currentUser = null;
+          
+          try {
+            existingSession = await account.getSession({sessionId: "current"});
+            currentUser = await account.get<UserPrefs>();
+            
+            // Check if session is still valid
+            const now = new Date().getTime();
+            const expiresAt = new Date(existingSession.expire).getTime();
+            
+            // If session is valid and user email matches, just update store
+            if (expiresAt > now && currentUser.email === email) {
+              const [user, {jwt}] = await Promise.all([
+                account.get<UserPrefs>(),
+                account.createJWT()
+              ]);
+              if(!user.prefs?.reputation) { 
+                await account.updatePrefs({reputation : 0} as any);
+              }
+              set({session: existingSession, user, jwt});
+              return {success : true};
+            }
+          } catch (e) {
+            // No existing session or session invalid, continue to create new one
+          }
+
+          // Delete any existing sessions before creating a new one
+          // This prevents "session already exists" error
+          try {
+            await account.deleteSessions();
+          } catch (e) {
+            // Ignore errors if no sessions exist
+          }
+
+          // Create new session
           const session = await account.createEmailPasswordSession({email, password});
           const [user, {jwt}] = await Promise.all([
             account.get<UserPrefs>(),
             account.createJWT()
-          ])
+          ]);
           if(!user.prefs?.reputation) { 
             await account.updatePrefs({reputation : 0} as any);
           }
           set({session, user, jwt});
-          return {success : true}
+          return {success : true};
         } catch (error) {
           return {
             success : false,
@@ -142,12 +202,20 @@ export const useAuthStore = create<InterfaceOfAuthStore>()(
 
       async logOut() {
         try {
+          // Delete all sessions from server
           await account.deleteSessions();
-          set({session : null, user : null, jwt : null, isVerifying: false});
         } catch (error) {
-          // Even if delete fails, clear local state
-          console.log(error);
-          set({session : null, user : null, jwt : null, isVerifying: false});
+          // Even if delete fails, continue to clear local state
+          console.log("Error deleting sessions:", error);
+        }
+        
+        // Always clear local state, even if server delete fails
+        set({session : null, user : null, jwt : null, isVerifying: false});
+        
+        // Clear persisted state from localStorage
+        // Do this synchronously to ensure it's cleared before redirect
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('auth-store');
         }
       },
     })),

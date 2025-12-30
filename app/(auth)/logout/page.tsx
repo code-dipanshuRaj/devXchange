@@ -1,12 +1,9 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
 import { getAuthStore } from "@/store/auth";
 
 export default function LogoutPage() {
-  const router = useRouter();
-
   React.useEffect(() => {
     (async () => {
       try {
@@ -14,8 +11,9 @@ export default function LogoutPage() {
       } catch (err) {
         console.error("Logout failed:", err);
       } finally {
-        // Redirect to home after logout
-        router.push("/");
+        // Use window.location.href for a full page reload to ensure state is cleared
+        // This ensures all components re-render with the cleared auth state
+        window.location.href = "/";
       }
     })();
 

@@ -22,39 +22,41 @@ export default function ProtectedRoute({
   const { hydrated, user, session, verifySession, isVerifying } = useAuthStore();
   const router = useRouter();
   const [isChecking, setIsChecking] = React.useState(true);
+  const [hasChecked, setHasChecked] = React.useState(false);
 
   React.useEffect(() => {
-    if (!hydrated) {
+    if (!hydrated || hasChecked) {
       return;
     }
 
     const checkAuth = async () => {
       if (!requireAuth) {
         setIsChecking(false);
+        setHasChecked(true);
         return;
       }
 
-      // If we have session/user, verify it's still valid
-      if (session || user) {
-        const isValid = await verifySession();
-        if (!isValid) {
-          router.push(redirectTo);
-          return;
-        }
-      } else {
-        // No session, redirect to login
+      // Always verify session to ensure it's still valid
+      const isValid = await verifySession();
+      
+      if (!isValid) {
+        // No valid session, redirect to login
         router.push(redirectTo);
+        setIsChecking(false);
+        setHasChecked(true);
         return;
       }
 
       setIsChecking(false);
+      setHasChecked(true);
     };
 
     checkAuth();
-  }, [hydrated, session, user, verifySession, router, redirectTo, requireAuth]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated]); // Only depend on hydrated to prevent infinite loops
 
   // Show loading while checking authentication
-  if (!hydrated || isChecking || isVerifying) {
+  if (!hydrated || (isChecking && !hasChecked) || isVerifying) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -65,8 +67,8 @@ export default function ProtectedRoute({
     );
   }
 
-  // If requireAuth is true and we don't have a user, don't render (redirect will happen)
-  if (requireAuth && !user) {
+  // If requireAuth is true and we don't have a user after verification, don't render (redirect will happen)
+  if (requireAuth && hasChecked && !user) {
     return null;
   }
 
