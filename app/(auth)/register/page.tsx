@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 import { getAuthStore } from "@/store/auth";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const BottomGradient = () => {
     return (
@@ -27,7 +28,7 @@ const LabelInputContainer = ({
 };
 
 export default function Register(){
-  
+    const router = useRouter();
   const [isLoading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const handleSubmit = async(e : React.FormEvent) => {
@@ -48,19 +49,20 @@ export default function Register(){
     const {success, error} = await signIn(email, password, name);
     setLoading(false);
     if(!success) setError(error?.message || "Something went wrong");
+    else router.push("/");
   }  
       return (
         <div className="mx-auto w-full max-w-md rounded-none border border-solid border-white/30 bg-white p-4 shadow-input dark:bg-black md:rounded-2xl md:p-8">
             <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">
-                Welcome to DevQuery
+                Welcome to devXchange
             </h2>
             <p className="mt-2 max-w-sm text-sm text-neutral-600 dark:text-neutral-300">
-                Signup with DevQuery if you don&apos;t have an account.
+                Signup with devXchange if you don&apos;t have an account.
                 <br /> If you already have an account,{" "}
                 <Link href="/login" className="text-orange-500 hover:underline">
                     login
                 </Link>{" "}
-                to DevQuery
+                to devXchange
             </p>
 
             {error && (
@@ -70,17 +72,17 @@ export default function Register(){
                 <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
                     <LabelInputContainer>
                         <Label htmlFor="firstname">First name</Label>
-                        <Input className="text-black" id="firstname" name="firstname" placeholder="Tyler" type="text" />
+                        <Input className="text-white" id="firstname" name="firstname" placeholder="Tyler" type="text" />
                     </LabelInputContainer>
                     <LabelInputContainer>
                         <Label htmlFor="lastname">Last name</Label>
-                        <Input className="text-black"  id="lastname" name="lastname" placeholder="Durden" type="text" />
+                        <Input className="text-white"  id="lastname" name="lastname" placeholder="Durden" type="text" />
                     </LabelInputContainer>
                 </div>
                 <LabelInputContainer className="mb-4">
                     <Label htmlFor="email">Email Address</Label>
                     <Input
-                    className="text-black" 
+                    className="text-white" 
                         id="email"
                         name="email"
                         placeholder="projectmayhem@fc.com"

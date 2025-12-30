@@ -52,14 +52,17 @@ export const useAuthStore = create<InterfaceOfAuthStore>()(
       async verifySession(){
         // Prevent concurrent verification calls
         if (get().isVerifying) {
+          console.log("verifySession: already verifying");
           return get().session !== null;
         }
 
+        console.log("verifySession: start");
         set({isVerifying: true});
         
         try {
           // First check if we have a session cookie by trying to get current session
           const session = await account.getSession({sessionId : "current"});
+          console.log("verifySession: got session", session);
           
           // Verify session is not expired
           const now = new Date().getTime();
@@ -67,6 +70,7 @@ export const useAuthStore = create<InterfaceOfAuthStore>()(
           
           if (expiresAt <= now) {
             // Session expired, clear state
+            console.log("verifySession: session expired");
             set({session: null, user: null, jwt: null, isVerifying: false});
             return false;
           }
@@ -83,16 +87,17 @@ export const useAuthStore = create<InterfaceOfAuthStore>()(
             }
             
             set({session, user, jwt, isVerifying: false});
+            console.log("verifySession: success", {user, jwt});
             return true;
           } catch (error) {
             // Failed to get user, session might be invalid
-            console.error("Failed to get user:", error);
+            console.error("verifySession: Failed to get user:", error);
             set({session: null, user: null, jwt: null, isVerifying: false});
             return false;
           }
         } catch (error) {
           // No valid session or session expired
-          console.log("Session verification failed:", error);
+          console.log("verifySession: Session verification failed:", error);
           set({session: null, user: null, jwt: null, isVerifying: false});
           return false;
         }
@@ -150,7 +155,10 @@ export const useAuthStore = create<InterfaceOfAuthStore>()(
       name : "auth-store",
       onRehydrateStorage(){
         return (state,error) => {
-          if (!error) state?.setHydrated();
+          if (!error) {
+            console.log("auth-store: rehydrated");
+            state?.setHydrated();
+          }
         }
       }
     }

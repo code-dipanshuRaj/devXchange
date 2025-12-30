@@ -6,6 +6,7 @@ import { Models, Query } from "node-appwrite";
 import { UserPrefs } from "@/store/auth";
 import convertDateToRelativeTime from "@/utils/relativeTime";
 import { avatars } from "@/models/client/config";
+import { ClientPageRoot } from "next/dist/client/components/client-page";
 
 const Notification = ({ user }: { user: Models.User<UserPrefs> }) => {
     return (
@@ -39,7 +40,7 @@ const Notification = ({ user }: { user: Models.User<UserPrefs> }) => {
                     <p className="text-sm font-normal dark:text-white/60">
                         <span>Reputation</span>
                         <span className="mx-1">·</span>
-                        <span className="text-xs text-gray-500">{user.prefs.reputation}</span>
+                        <span className="text-xs text-gray-500">{user.prefs?.reputation || 0}</span>
                     </p>
                 </div>
             </div>
@@ -48,12 +49,18 @@ const Notification = ({ user }: { user: Models.User<UserPrefs> }) => {
 };
 
 export default async function TopContributers() {
-    const topUsers = await users.list<UserPrefs>({queries : [Query.limit(10)]});
-
+    // Users API doesn't support ordering by nested `prefs.reputation` reliably,
+    // so fetch a larger page and sort by reputation in this layer.
+    const res = await users.list<UserPrefs>({ queries: [Query.limit(100)] });
+    console.log(res);
+    const topUsers = res.users
+        .sort((a, b) => (a.prefs?.reputation || 0) - (b.prefs?.reputation || 0))
+        .slice(0, 10);
+    console.log(topUsers);
     return (
         <div className="bg-background relative flex max-h-[400px] min-h-[400px] w-full max-w-[32rem] flex-col overflow-hidden rounded-lg bg-white/10 p-6 shadow-lg">
             <AnimatedList>
-                {topUsers.users.map(user => (
+                {topUsers.map(user => (
                     <Notification user={user} key={user.$id} />
                 ))}
             </AnimatedList>

@@ -5,7 +5,8 @@ import EditQues from "./EditQues";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 const Page = async ({ params }: { params: { quesId: string; quesName: string } }) => {
-    const question = await tableDB.getRow({databaseId : db, tableId : questionsCollection, rowId : params.quesId});
+    const {quesId} = await params;
+    const question = await tableDB.getRow({databaseId : db, tableId : questionsCollection, rowId : quesId});
 
     return (
         <ProtectedRoute>

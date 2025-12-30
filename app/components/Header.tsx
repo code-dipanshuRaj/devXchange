@@ -42,6 +42,20 @@ export default function Header() {
                 link: `/users/${user.$id}/${slugify(user.name)}`,
                 icon: <IconMessage className="h-4 w-4 text-neutral-500 dark:text-white" />,
             });
+        } 
+
+        if(!user){
+            items.push({
+                name : "Login",
+                link : "/login",
+                icon : <IconMessage className="h-4 w-4 text-neutral-500 dark:text-white" />
+            })
+        } else{
+            items.push({
+                name : "Logout",
+                link : "/logout",
+                icon : <IconMessage className="h-4 w-4 text-neutral-500 dark:text-white" />
+            })
         }
 
         setNavItems(items);

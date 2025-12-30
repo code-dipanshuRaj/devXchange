@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 import { getAuthStore } from "@/store/auth";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const BottomGradient = () => {
     return (
@@ -31,6 +32,7 @@ export default function Login() {
     const { logIn } = getAuthStore();
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState("");
+    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -41,6 +43,13 @@ export default function Login() {
 
         if (!email || !password) {
             setError(() => "Please fill out all fields");
+            return;
+        }
+
+        // If a session already exists, verify and redirect instead of creating new
+        const already = await getAuthStore().verifySession();
+        if (already) {
+            router.push("/")
             return;
         }
 
@@ -60,10 +69,10 @@ export default function Login() {
     return (
         <div className="mx-auto w-full max-w-md rounded-none border border-solid border-white/30 bg-white p-4 shadow-input dark:bg-black md:rounded-2xl md:p-8">
             <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">
-                Login to DevQuery
+                Login to devXchange
             </h2>
             <p className="mt-2 max-w-sm text-sm text-neutral-600 dark:text-neutral-300">
-                Login to DevQuery
+                Login to devXchange
                 <br /> If you don&apos;t have an account,{" "}
                 <Link href="/register" className="text-orange-500 hover:underline">
                     register
@@ -78,7 +87,7 @@ export default function Login() {
                 <LabelInputContainer className="mb-4">
                     <Label htmlFor="email">Email Address</Label>
                     <Input
-                    className="text-black"
+                    className="text-white"
                         id="email"
                         name="email"
                         placeholder="projectmayhem@fc.com"
@@ -87,7 +96,7 @@ export default function Login() {
                 </LabelInputContainer>
                 <LabelInputContainer className="mb-4">
                     <Label htmlFor="password">Password</Label>
-                    <Input className="text-black" id="password" name="password" placeholder="••••••••" type="password" />
+                    <Input className="text-white" id="password" name="password" placeholder="••••••••" type="password" />
                 </LabelInputContainer>
 
                 <button

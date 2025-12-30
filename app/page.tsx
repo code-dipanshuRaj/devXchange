@@ -5,6 +5,7 @@ import LatestQuestions from "./components/LatestQuestions";
 import TopContributers from "./components/TopContributers";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import Link from "next/link";
+import { MagicCard } from "@/components/ui/magic-card";
 
 const features = [
   {
@@ -49,7 +50,7 @@ export default function Home() {
 
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {features.map((f) => (
-            <article key={f.title} className="group rounded-2xl border border-white/10 p-6 hover:shadow-lg transition-shadow">
+            <MagicCard key={f.title} className="group rounded-2xl border border-white/10 p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center gap-4">
                 <div className="rounded-full bg-white/5 p-3">{f.icon}</div>
                 <h3 className="text-lg font-semibold">{f.title}</h3>
@@ -62,7 +63,7 @@ export default function Home() {
                   </ShimmerButton>
                 </Link>
               </div>
-            </article>
+            </MagicCard>
           ))}
         </div>
       </section>
