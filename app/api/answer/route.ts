@@ -13,7 +13,7 @@ export async function POST(req : NextRequest){
       rowId : ID.unique(),
       data : {
         questionId,
-        answer,
+        content : answer,
         authorId
       }
     });

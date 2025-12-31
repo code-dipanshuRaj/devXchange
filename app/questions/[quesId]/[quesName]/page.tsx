@@ -91,7 +91,7 @@ const Page = async ({ params }: { params: { quesId: string; quesName: string } }
     const author = await users.get<UserPrefs>(question.authorId);
     const [enrichedComments, enrichedAnswers] = await Promise.all([
         Promise.all(
-            comments.rows.map(async comment => {
+            (comments.rows || []).map(async comment => {
                 const author = await users.get<UserPrefs>({userId : comment.authorId});
                 return {
                     ...comment,
@@ -126,19 +126,25 @@ const Page = async ({ params }: { params: { quesId: string; quesName: string } }
                     ]}),
                 ]);
 
-                comments.rows = await Promise.all(
-                    comments.rows.map(async comment => {
-                        const author = await users.get<UserPrefs>(comment.authorId);
-                        return {
-                            ...comment,
-                            author: {
-                                $id: author.$id,
-                                name: author.name,
-                                reputation: author.prefs.reputation,
-                            },
-                        };
-                    })
-                );
+                // Ensure comments.rows exists before mapping
+                if (comments.rows && comments.rows.length > 0) {
+                    comments.rows = await Promise.all(
+                        comments.rows.map(async comment => {
+                            const author = await users.get<UserPrefs>(comment.authorId);
+                            return {
+                                ...comment,
+                                author: {
+                                    $id: author.$id,
+                                    name: author.name,
+                                    reputation: author.prefs.reputation,
+                                },
+                            };
+                        })
+                    );
+                } else {
+                    // Ensure rows is always an array
+                    comments.rows = [];
+                }
 
                 return {
                     ...answer,
@@ -154,6 +160,10 @@ const Page = async ({ params }: { params: { quesId: string; quesName: string } }
             })
         ),
     ]);
+    console.log(storage.getFileView({
+                                        bucketId: questionAttachmentsBucket,
+                                        fileId : question.attachmentId
+                                    }))
     const enrichedAnswersList: Models.RowList<AnswersWithExtraData> = {
         total: enrichedAnswers.length,
         rows: enrichedAnswers,
@@ -209,7 +219,7 @@ const Page = async ({ params }: { params: { quesId: string; quesName: string } }
                         <picture>
                             <img
                                 src={
-                                    storage.getFilePreview({
+                                    storage.getFileView({
                                         bucketId: questionAttachmentsBucket,
                                         fileId : question.attachmentId
                                     })

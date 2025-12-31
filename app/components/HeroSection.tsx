@@ -65,14 +65,14 @@ export default async function HeroSection() {
 
     return (
         <>
-            <HeroParallax products={ testingImages }/>
-            {/* <HeroParallax
+            {/* <HeroParallax products={ testingImages }/> */}
+            <HeroParallax
                 products={questions.rows.map(q => ({
                     title: q.title,
                     link: `/questions/${q.$id}/${slugify(q.title)}`,
-                    thumbnail: storage.getFilePreview({bucketId : questionAttachmentsBucket, fileId: q.attachmentId}),
+                    thumbnail: storage.getFileView({bucketId : questionAttachmentsBucket, fileId: q.attachmentId}),
                 }))}
-            /> */}
+            /> 
         </>
     );
 }

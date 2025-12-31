@@ -30,7 +30,13 @@ const Comments = ({
     className?: string;
 }) => {
     
-    const [comments, setComments] = React.useState(_comments);
+    // Ensure comments has a valid structure with rows array
+    const [comments, setComments] = React.useState<Models.RowList<CommentWithAuthor>>(() => {
+        if (!_comments || !_comments.rows) {
+            return { total: 0, rows: [] };
+        }
+        return _comments;
+    });
 
     const [newComment, setNewComment] = React.useState("");
     const { user, hydrated } = useAuthStore();
@@ -52,8 +58,8 @@ const Comments = ({
             }});
             console.log("Created comment: in Comment.tsx component", response);
             setComments(prev => ({
-                total: prev.total + 1,
-                rows: [{ ...response, authorId: user.$id, content: newComment, author: user }, ...prev.rows],
+                total: (prev?.total || 0) + 1,
+                rows: [{ ...response, authorId: user.$id, content: newComment, author: user }, ...(prev?.rows || [])],
             }));
         } catch (error: any) {
             window.alert(error?.message || "Error creating comment");
@@ -69,8 +75,8 @@ const Comments = ({
             });
 
             setComments(prev => ({
-                total: prev.total - 1,
-                rows: prev.rows.filter(comment => comment.$id !== commentId),
+                total: Math.max(0, (prev?.total || 0) - 1),
+                rows: (prev?.rows || []).filter(comment => comment.$id !== commentId),
             }));
         } catch (error: any) {
             window.alert(error?.message || "Error deleting comment");
@@ -79,7 +85,7 @@ const Comments = ({
 
     return (
         <div className={cn("flex flex-col gap-2 pl-4", className)}>
-            {comments.rows.map(comment => (
+            {(comments?.rows || []).map(comment => (
                 <React.Fragment key={comment.$id}>
                     <hr className="border-white/40" />
                     <div className="flex gap-2">

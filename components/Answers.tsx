@@ -38,7 +38,11 @@ const Answers = ({
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!newAnswer || !user) return;
+        if (!newAnswer || !user) {
+            window.alert("You must be logged in to post an answer.");
+            window.location.href = "/login"
+            return;
+        }
 
         try {
             const response = await fetch("/api/answer", {
@@ -49,6 +53,7 @@ const Answers = ({
                     authorId: user.$id,
                 }),
             });
+            console.log("response in Answers.tsx:", response);
 
             const data = await response.json();
 

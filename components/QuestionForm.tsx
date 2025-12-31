@@ -152,7 +152,7 @@ const QuestionForm = ({ question } : { question?: QuestionWithFields }) => {
                 fileId: ID.unique(),
                 file: formData.attachment
             });
-
+            console.log(file)
             return file.$id;
         })();
 
