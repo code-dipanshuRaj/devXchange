@@ -23,7 +23,7 @@ export default function Header() {
     React.useEffect(() => {
         if (!hydrated) return;
 
-        const items = [
+        let items = [
             {
                 name: "Home",
                 link: "/",

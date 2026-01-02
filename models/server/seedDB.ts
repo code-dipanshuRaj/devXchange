@@ -7,22 +7,43 @@ import createVotesCollection from "./vote.collection";
 
 import { tableDB } from "./config";
 
-export default async function getOrCreateDB(){
-    try {
-        const res = await tableDB.get({databaseId : db})
-        console.log("Database connection established successfully ",res)
-    } catch (error) {
-      try {
-        await createDBIfNotExists(),
-        await Promise.all([
-          createAnswersCollection(),
-          createQuestionsCollection(),
-          createCommentsCollection(),
-          createVotesCollection()  
-        ])
-        console.log("Database connected and all collections created")
-      } catch (error) {
-        console.log("Error connecting or creating Database", error)
-      }
+let dbInitialized = false;
+let dbInitializationPromise: Promise<void> | null = null;
+
+export default async function getOrCreateDB(): Promise<void> {
+    if (dbInitialized) {
+        return;
     }
+
+    if (dbInitializationPromise) {
+        return dbInitializationPromise;
+    }
+
+    // Start initialization (only once)
+    dbInitializationPromise = (async () => {
+        try {
+            // Quick check if DB exists 
+            await tableDB.get({databaseId : db});
+            console.log("Database connection verified");
+            dbInitialized = true;
+        } catch (error) {
+            // DB doesn't exist, creating DB and collections 
+            try {
+                await createDBIfNotExists();
+                await Promise.all([
+                    createAnswersCollection(),
+                    createQuestionsCollection(),
+                    createCommentsCollection(),
+                    createVotesCollection()  
+                ]);
+                console.log("Database and collections created successfully");
+                dbInitialized = true;
+            } catch (createError) {
+                console.error("Error creating Database:", createError);
+                throw createError;
+            }
+        }
+    })();
+
+    return dbInitializationPromise;
 }

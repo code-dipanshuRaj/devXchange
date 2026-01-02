@@ -27,31 +27,37 @@ const Page = async ({ params }: { params: { userId: string; userSlug: string } }
 
         return (
             <div className={"flex h-[500px] w-full flex-col gap-4 lg:h-[250px] lg:flex-row"}>
-                <MagicCard className="flex w-full cursor-pointer flex-col items-center justify-center overflow-hidden p-20 shadow-2xl">
-                    <div className="absolute inset-x-4 top-4">
+                <MagicCard className="relative flex w-full cursor-pointer flex-col overflow-hidden p-6 shadow-2xl">
+                    <div className="absolute inset-x-4 top-4 z-20">
                         <h2 className="text-xl font-medium">Reputation</h2>
                     </div>
-                    <p className="z-10 whitespace-nowrap text-4xl font-medium text-gray-800 dark:text-gray-200">
-                        <NumberTicker value={user.prefs.reputation} />
-                    </p>
+                    <div className="flex flex-1 items-center justify-center pt-8">
+                        <p className="z-10 whitespace-nowrap text-4xl font-medium text-gray-800 dark:text-gray-200">
+                            <NumberTicker value={user.prefs.reputation} />
+                        </p>
+                    </div>
                     <div className="pointer-events-none absolute inset-0 h-full bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
                 </MagicCard>
-                <MagicCard className="flex w-full cursor-pointer flex-col items-center justify-center overflow-hidden p-20 shadow-2xl">
-                    <div className="absolute inset-x-4 top-4">
+                <MagicCard className="relative flex w-full cursor-pointer flex-col overflow-hidden p-6 shadow-2xl">
+                    <div className="absolute inset-x-4 top-4 z-20">
                         <h2 className="text-xl font-medium">Questions asked</h2>
                     </div>
-                    <p className="z-10 whitespace-nowrap text-4xl font-medium text-gray-800 dark:text-gray-200">
-                        <NumberTicker value={questions.total} />
-                    </p>
+                    <div className="flex flex-1 items-center justify-center pt-8">
+                        <p className="z-10 whitespace-nowrap text-4xl font-medium text-gray-800 dark:text-gray-200">
+                            <NumberTicker value={questions.total} />
+                        </p>
+                    </div>
                     <div className="pointer-events-none absolute inset-0 h-full bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
                 </MagicCard>
-                <MagicCard className="flex w-full cursor-pointer flex-col items-center justify-center overflow-hidden p-20 shadow-2xl">
-                    <div className="absolute inset-x-4 top-4">
+                <MagicCard className="relative flex w-full cursor-pointer flex-col overflow-hidden p-6 shadow-2xl">
+                    <div className="absolute inset-x-4 top-4 z-20">
                         <h2 className="text-xl font-medium">Answers given</h2>
                     </div>
-                    <p className="z-10 whitespace-nowrap text-4xl font-medium text-gray-800 dark:text-gray-200">
-                        <NumberTicker value={answers.total} />
-                    </p>
+                    <div className="flex flex-1 items-center justify-center pt-8">
+                        <p className="z-10 whitespace-nowrap text-4xl font-medium text-gray-800 dark:text-gray-200">
+                            <NumberTicker value={answers.total} />
+                        </p>
+                    </div>
                     <div className="pointer-events-none absolute inset-0 h-full bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
                 </MagicCard>
             </div>

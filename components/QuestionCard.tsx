@@ -75,7 +75,7 @@ const QuestionCard = ({ ques }: { ques: QuestionWithFields }) => {
                         >
                             {ques.author.name}
                         </Link>
-                        <strong>&quot;{ques.author.reputation}&quot;</strong>
+                        <strong className="text-amber-600 text-center">⭐{ques.author.reputation}</strong>
                     </div>
                     <span>asked {convertDateToRelativeTime(new Date(ques.$createdAt))}</span>
                 </div>
