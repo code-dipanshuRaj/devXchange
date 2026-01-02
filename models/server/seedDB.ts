@@ -19,7 +19,6 @@ export default async function getOrCreateDB(): Promise<void> {
         return dbInitializationPromise;
     }
 
-    // Start initialization (only once)
     dbInitializationPromise = (async () => {
         try {
             // Quick check if DB exists 

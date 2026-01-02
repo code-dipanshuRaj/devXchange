@@ -31,10 +31,9 @@ export default function SessionProvider({ children }: { children: React.ReactNod
     } else {
       setIsInitializing(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated]); // Only depend on hydrated to avoid infinite loops
+  }, [hydrated]); // to avoid infinite loops
 
-  // Show loading state while verifying session if we have a session
+  // loading screen if we have a session 
   if (!hydrated || isInitializing || isVerifying) {
     return (
       <div className="flex min-h-screen items-center justify-center">

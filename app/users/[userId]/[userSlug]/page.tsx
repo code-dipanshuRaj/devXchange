@@ -7,7 +7,6 @@ import { answersCollection, db, questionsCollection } from "@/models/name";
 import { Query } from "node-appwrite";
 
 const Page = async ({ params }: { params: { userId: string; userSlug: string } }) => {
-    // params is a plain object on the server
     const { userId } = await params;
 
     try {

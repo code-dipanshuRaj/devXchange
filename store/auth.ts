@@ -60,7 +60,7 @@ export const useAuthStore = create<InterfaceOfAuthStore>()(
         set({isVerifying: true});
         
         try {
-          // First check if we have a session cookie by trying to get current session
+          // First checking if we have a session cookie by trying to get current session
           const session = await account.getSession({sessionId : "current"});
           console.log("verifySession: got session", session);
           
@@ -109,10 +109,10 @@ export const useAuthStore = create<InterfaceOfAuthStore>()(
           try {
             await account.deleteSessions();
           } catch (e) {
-            // Ignore errors if no sessions exist
+            // Ignore
           }
 
-          // Create the account
+          // Creating account
           const user = await account.create({
             userId: ID.unique(),
             email,

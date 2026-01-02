@@ -13,49 +13,49 @@ type QuestionData = Models.Row & {
     attachmentId: string;
 };
 
-const testingImages = [
-    {
-        title: "Sample Question 1",
-        link: "/questions/1/sample-question-1",
-        thumbnail: "https://picsum.photos/300/300.jpg"
-    },
-    {
-        title: "Sample Question 2",
-        link: "/questions/1/sample-question-1",
-        thumbnail: "https://picsum.photos/400/400.jpg"
-    },
-    {
-        title: "Sample Question 3",
-        link: "/questions/1/sample-question-1",
-        thumbnail: "https://picsum.photos/200/300.jpg"
-    },
-    {
-        title: "Sample Question 4",
-        link: "/questions/1/sample-question-1",
-        thumbnail: "https://picsum.photos/300/200.jpg"
-    },
-    {
-        title: "Sample Question 10",
-        link: "/questions/1/sample-question-1",
-        thumbnail: "https://picsum.photos/200/200.jpg"
-    },
-    {
-        title: "Sample Question 5",
-        link: "/questions/1/sample-question-1",
-        thumbnail: "https://picsum.photos/250/300.jpg"
-    },
-    {
-        title: "Sample Question 6",
-        link: "/questions/1/sample-question-1",
-        thumbnail: "https://picsum.photos/200/350.jpg"
-    },
-    {
-        title: "Sample Question 7",
-        link: "https://picsum.photos/",
-        thumbnail: "https://picsum.photos/250/350.jpg"
-    },
+// const testingImages = [
+//     {
+//         title: "Sample Question 1",
+//         link: "/questions/1/sample-question-1",
+//         thumbnail: "https://picsum.photos/300/300.jpg"
+//     },
+//     {
+//         title: "Sample Question 2",
+//         link: "/questions/1/sample-question-1",
+//         thumbnail: "https://picsum.photos/400/400.jpg"
+//     },
+//     {
+//         title: "Sample Question 3",
+//         link: "/questions/1/sample-question-1",
+//         thumbnail: "https://picsum.photos/200/300.jpg"
+//     },
+//     {
+//         title: "Sample Question 4",
+//         link: "/questions/1/sample-question-1",
+//         thumbnail: "https://picsum.photos/300/200.jpg"
+//     },
+//     {
+//         title: "Sample Question 10",
+//         link: "/questions/1/sample-question-1",
+//         thumbnail: "https://picsum.photos/200/200.jpg"
+//     },
+//     {
+//         title: "Sample Question 5",
+//         link: "/questions/1/sample-question-1",
+//         thumbnail: "https://picsum.photos/250/300.jpg"
+//     },
+//     {
+//         title: "Sample Question 6",
+//         link: "/questions/1/sample-question-1",
+//         thumbnail: "https://picsum.photos/200/350.jpg"
+//     },
+//     {
+//         title: "Sample Question 7",
+//         link: "https://picsum.photos/",
+//         thumbnail: "https://picsum.photos/250/350.jpg"
+//     },
 
-]
+// ]
 
 export default async function HeroSection() {
     const questions = await tableDB.listRows<QuestionData>({databaseId : db, tableId : questionsCollection, queries : [

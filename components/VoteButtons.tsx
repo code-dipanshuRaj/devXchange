@@ -30,7 +30,6 @@ const VoteButtons = ({
 
     React.useEffect(() => {
         (async () => {
-            // Wait for hydration before checking user
             if (!hydrated) return;
             
             if (user) {
@@ -41,7 +40,6 @@ const VoteButtons = ({
                 ]});
                 setVotedDocument(response.rows[0] || null);    
             } else {
-                // No user, set to null (not undefined) to indicate checked
                 setVotedDocument(null);
             }
         })();

@@ -10,10 +10,8 @@ interface ProtectedRouteProps {
   requireAuth?: boolean;
 }
 
-/**
- * ProtectedRoute component that ensures user is authenticated before rendering children
- * If user is not authenticated, redirects to login page
- */
+// ProtectedRoute component that ensures user is authenticated before rendering children
+// If user is not authenticated, redirects to login page
 export default function ProtectedRoute({ 
   children, 
   redirectTo = "/login",
@@ -52,10 +50,9 @@ export default function ProtectedRoute({
     };
 
     checkAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated]); // Only depend on hydrated to prevent infinite loops
+  }, [hydrated]); // to prevent infinite loops
 
-  // Show loading while checking authentication
+  // loading screen
   if (!hydrated || (isChecking && !hasChecked) || isVerifying) {
     return (
       <div className="flex min-h-screen items-center justify-center">
