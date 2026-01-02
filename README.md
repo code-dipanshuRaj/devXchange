@@ -246,17 +246,6 @@ stackoverflow-clone/
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 
-## 🚢 Deployment
-
-The application can be deployed on any platform that supports Next.js:
-
-- **Vercel** (Recommended) - Optimized for Next.js
-- **Netlify** - Great for static/serverless
-- **Railway** - Full-stack deployment
-- **Docker** - Containerized deployment
-
-Make sure to set environment variables in your deployment platform.
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
