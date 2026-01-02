@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import getOrCreateDB from "./models/server/seedDB";
 import getOrCreateStorage from "./models/server/storage.collection";
 
-// Initialize Database and Storage Bucket
+// Initializing Database and Storage Bucket
 export async function proxy(req : NextRequest){
   await getOrCreateDB();
   await getOrCreateStorage();
