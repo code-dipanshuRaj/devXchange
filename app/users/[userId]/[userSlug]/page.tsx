@@ -6,7 +6,7 @@ import { NumberTicker } from "@/components/ui/number-ticker";
 import { answersCollection, db, questionsCollection } from "@/models/name";
 import { Query } from "node-appwrite";
 
-const Page = async ({ params }: { params: { userId: string; userSlug: string } }) => {
+const Page = async ({ params }: { params: Promise<{ userId: string; userSlug: string }> }) => {
     const { userId } = await params;
 
     try {

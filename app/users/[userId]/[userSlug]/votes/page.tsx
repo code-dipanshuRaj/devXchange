@@ -11,8 +11,8 @@ const Page = async ({
     params,
     searchParams,
 }: {
-    params: { userId: string; userSlug: string };
-    searchParams: { page?: string; voteStatus?: "upvoted" | "downvoted" };
+    params: Promise<{ userId: string; userSlug: string }>;
+    searchParams: Promise<{ page?: string; voteStatus?: "upvoted" | "downvoted" }>;
 }) => {
     const {userId, userSlug} = await params;
     console.log(userId)

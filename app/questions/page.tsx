@@ -31,7 +31,7 @@ type QuestionWithExtraData = QuestionAttributes & {
 const Page = async ({
     searchParams,
 }: {
-    searchParams: { page?: string; tag?: string; search?: string };
+    searchParams: Promise<{ page?: string; tag?: string; search?: string }>;
 }) => {
     const {page, tag, search} = await searchParams;
     const searchPage = page || "1";
