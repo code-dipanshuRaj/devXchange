@@ -11,13 +11,10 @@ export default function LogoutPage() {
       } catch (err) {
         console.error("Logout failed:", err);
       } finally {
-        // Use window.location.href for a full page reload to ensure state is cleared
-        // This ensures all components re-render with the cleared auth state
         window.location.href = "/";
       }
     })();
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
