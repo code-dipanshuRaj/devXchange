@@ -8,7 +8,9 @@ import { questionsCollection, answersCollection } from "@/models/name";
 export async function POST(req : NextRequest){
   try {
     const {votedById, voteStatus, type, typeId} = await req.json();
-    const response = await tableDB.listRows({
+    
+    // Check if user already voted on this question/answer
+    const existingVoteResponse = await tableDB.listRows({
       databaseId : db,
       tableId : votesCollection,
       queries : [
@@ -16,62 +18,42 @@ export async function POST(req : NextRequest){
         Query.equal("typeId", typeId),
         Query.equal("votedById", votedById)
       ]
-    })
-    console.log("Vote Check Response in app/api/vote [\"route\"]:", response);
-
-    // vote already exists
-    if(response.rows.length > 0){
+    });
+    
+    const existingVote = existingVoteResponse.rows[0];
+    const previousVoteStatus = existingVote?.voteStatus;
+    
+    // Get the question or answer to find the AUTHOR
+    const questionOrAnswer = await tableDB.getRow({
+      databaseId : db,
+      tableId : type === "question" ? questionsCollection : answersCollection,
+      rowId : typeId
+    });
+    
+    const authorPrefs = await users.getPrefs<UserPrefs>({userId : questionOrAnswer.authorId});
+    let newReputation = Number(authorPrefs.reputation);
+    
+    // If vote already exists and user is clicking the same vote again
+    if (existingVote && previousVoteStatus === voteStatus) {
+      // Remove the vote
       await tableDB.deleteRow({
         databaseId : db,
         tableId : votesCollection,
-        rowId : response.rows[0].$id
+        rowId : existingVote.$id
       });
-
-      const questionOrAnswer = await tableDB.getRow({
-        databaseId : db,
-        tableId : type === "question" ? "questions" : "answers",
-        rowId : typeId
-      });
-      const authorPrefs = await users.getPrefs<UserPrefs>({userId : questionOrAnswer.authorId});
-
-      await users.updatePrefs({userId : questionOrAnswer.authorId, prefs: {
-        reputation : response.rows[0].voteStatus === "upvoted" 
-          ? Number(authorPrefs.reputation) - 1 
-          : Number(authorPrefs.reputation) + 1
-      }});
-    }
-
-    // that means prev vote does not exists or voteStatus changed
-    if(response.rows[0]?.voteStatus !== voteStatus){
-      const res = await tableDB.createRow({
-        databaseId : db,
-        tableId : votesCollection,
-        rowId : ID.unique(),
-        data : {
-          type,
-          typeId,
-          voteStatus,
-          votedById
-        }
-      })
-      console.log("Vote Creation Response in app/api/vote [\"route\"]:", res);
-
-      const questionOrAnswer = await tableDB.getRow({
-                databaseId : db,
-                tableId : type === "question" ? questionsCollection : answersCollection,
-                rowId :typeId
-            });
-      const authorPrefs = await users.getPrefs<UserPrefs>({userId : questionOrAnswer.authorId});
       
-      // if vote was present on this question or ans then user toggled the vote or else changed from no vote to upvote/downvote
-        await users.updatePrefs({userId :  questionOrAnswer.authorId, prefs: {
-          reputation : 
-            // current opted status update
-            voteStatus === "upvoted" 
-              ? Number(authorPrefs.reputation) + 1 
-              : Number(authorPrefs.reputation) - 1
-        }});
-
+      // Reverse change
+      if (voteStatus === "upvoted") {
+        newReputation -= 1;
+      } else {
+        newReputation += 1;
+      }
+      
+      await users.updatePrefs({
+        userId : questionOrAnswer.authorId, 
+        prefs: { reputation: newReputation }
+      });
+      
       const [upvotesResponse, downvotesResponse] = await Promise.all([
         tableDB.listRows({
           databaseId : db,
@@ -92,18 +74,59 @@ export async function POST(req : NextRequest){
             Query.limit(1)
           ]})
       ]);
-
+      
       return NextResponse.json(
         { 
-          data : {document : res, voteResult : upvotesResponse.total - downvotesResponse.total},
-          message: response.rows[0] ? "Vote Status Updated" : "Voted",
+          data : {document : null, voteResult : upvotesResponse.total - downvotesResponse.total},
+          message: "Vote Withdrawn",
         },
         {
-          status : 201
+          status : 200
         }
-      )
+      );
     }
-
+    
+    // If vote exists but status is different (toggling)
+    if (existingVote && previousVoteStatus !== voteStatus) {
+      await tableDB.deleteRow({
+        databaseId : db,
+        tableId : votesCollection,
+        rowId : existingVote.$id
+      });
+      
+      // Reverse the old vote's reputation change
+      if (previousVoteStatus === "upvoted") {
+        newReputation -= 1;
+      } else {
+        newReputation += 1;
+      }
+    }
+    
+    const voteRes = await tableDB.createRow({
+      databaseId : db,
+      tableId : votesCollection,
+      rowId : ID.unique(),
+      data : {
+        type,
+        typeId,
+        voteStatus,
+        votedById
+      }
+    });
+    
+    // Apply the new vote's reputation change
+    if (voteStatus === "upvoted") {
+      newReputation += 1;
+    } else {
+      newReputation -= 1;
+    }
+    
+    // Update reputation 
+    await users.updatePrefs({
+      userId : questionOrAnswer.authorId, 
+      prefs: { reputation: newReputation }
+    });
+    
     const [upvotesResponse, downvotesResponse] = await Promise.all([
       tableDB.listRows({
         databaseId : db,
@@ -124,16 +147,18 @@ export async function POST(req : NextRequest){
           Query.limit(1)
         ]})
     ]);
-    
+
     return NextResponse.json(
-    { 
-      data : {document : null, voteResult : upvotesResponse.total - downvotesResponse.total},
-      message: "Vote Withdrawn",
-    },
-    {
-      status : 200
-    });
+      { 
+        data : {document : voteRes, voteResult : upvotesResponse.total - downvotesResponse.total},
+        message: existingVote ? "Vote Status Updated" : "Voted",
+      },
+      {
+        status : 201
+      }
+    );
   }catch (error : any) {
+    console.error("Vote API Error:", error);
     return NextResponse.json(
       {
         message : error?.message || "Internal Server Error"

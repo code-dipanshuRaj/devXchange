@@ -3,10 +3,8 @@
 import React from "react";
 import { useAuthStore } from "@/store/auth";
 
-/**
- * AuthProvider component that verifies session on app initialization
- * This ensures that expired sessions are cleared when the app loads
- */
+// AuthProvider component that verifies session on app initialization
+// This ensures that expired sessions are cleared when the app loads
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const { hydrated, session, user, verifySession } = useAuthStore();
   const hasVerifiedRef = React.useRef(false);
